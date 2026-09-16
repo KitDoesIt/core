@@ -1,4 +1,3 @@
-import { createRequire } from 'module';
 import { EamuseRouteHandler } from './EamuseRouteContainer';
 import { EamuseInfo } from '../middlewares/EamuseMiddleware';
 import { EamuseSend } from './EamuseSend';
@@ -20,14 +19,6 @@ import { FindCard, CreateProfile, CreateCard, BindProfile } from '../utils/Eamus
 import { compile } from 'pug';
 import { CONFIG } from '../utils/ArgConfig';
 import { nfc2card } from '../utils/CardCipher';
-
-/**
- * `require` for plugin DATA/render expressions. The old CommonJS core
- * exposed `require` to `eval()` automatically; bundled builds need to
- * provide it explicitly. Relative paths resolve from the process
- * working directory, where plugins and assets live.
- */
-const coreRequire = createRequire(path.join(process.cwd(), 'index.js'));
 
 async function cardSanitizer(gameCode: string, str: string, refMap: any): Promise<string> {
   const regex =
@@ -196,7 +187,6 @@ export class EamusePlugin {
       ReadFile: nothingAsync,
       ReadDir: nothingAsync,
     };
-    const require = coreRequire;
 
     const result = (() => {
       if (isProfile) {
@@ -325,7 +315,6 @@ export class EamusePlugin {
     const $ = {},
       R = {},
       K = {};
-    const require = coreRequire;
 
     const local: any = { refid };
     for (const prop in cache.props) {
