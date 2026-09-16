@@ -13,7 +13,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { deflateRawSync } from 'node:zlib';
-import * as ResEdit from 'resedit';
 
 const ROOT = path.resolve(import.meta.dir, '..');
 const BUILD_DIR = path.join(ROOT, 'build');
@@ -83,10 +82,16 @@ async function compile(target, binaryPath) {
 
 // ------------------------------------------------------- windows icon patch
 
-function embedWindowsIcon(exePath, icoPath) {
+let reseditPromise = null;
+function loadResEdit() {
+  if (!reseditPromise) reseditPromise = import('resedit');
+  return reseditPromise;
+}
+
+async function embedWindowsIcon(exePath, icoPath) {
   const original = fs.readFileSync(exePath);
   const originalSize = original.length;
-  const { NtExecutable, NtExecutableResource, Resource, Data } = ResEdit;
+  const { NtExecutable, NtExecutableResource, Resource, Data } = await loadResEdit();
 
   const exe = NtExecutable.from(original);
   const sections = exe.getAllSections();
@@ -246,7 +251,30 @@ function createZip(zipPath, files) {
 
 // -------------------------------------------------------------------- main
 
+function ensureDependencies() {
+  if (fs.existsSync(path.join(ROOT, 'node_modules'))) return;
+
+  console.log('Installing dependencies...');
+  let result = Bun.spawnSync(['bun', 'install', '--frozen-lockfile'], {
+    cwd: ROOT,
+    stdout: 'inherit',
+    stderr: 'inherit',
+  });
+  if (result.exitCode !== 0) {
+    result = Bun.spawnSync(['bun', 'install'], {
+      cwd: ROOT,
+      stdout: 'inherit',
+      stderr: 'inherit',
+    });
+  }
+  if (result.exitCode !== 0) {
+    console.error('build: failed to install dependencies');
+    process.exit(result.exitCode ?? 1);
+  }
+}
+
 async function main() {
+  ensureDependencies();
   const ver = version();
   fs.mkdirSync(BUILD_DIR, { recursive: true });
   console.log(`Building Asphyxia CORE ${ver}`);
@@ -260,7 +288,7 @@ async function main() {
 
     if (target.startsWith('bun-windows-')) {
       try {
-        embedWindowsIcon(binaryPath, ICON);
+        await embedWindowsIcon(binaryPath, ICON);
         console.log(`     embedded icon.ico`);
       } catch (err) {
         console.warn(`     warning: could not embed icon.ico: ${err.message}`);
