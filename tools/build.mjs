@@ -42,13 +42,6 @@ if (targets.length === 0) targets.push(...DEFAULT_TARGETS);
 const noZip = args.includes('--no-zip');
 const outfileArg = args.find(arg => arg.startsWith('--outfile='));
 const outfile = outfileArg ? outfileArg.slice('--outfile='.length) : null;
-const sourcemapArg = args.find(arg => arg.startsWith('--sourcemap='));
-const sourcemap = sourcemapArg ? sourcemapArg.slice('--sourcemap='.length) : 'inline';
-
-if (!['inline', 'external', 'linked', 'none'].includes(sourcemap)) {
-  console.error(`build: invalid --sourcemap=${sourcemap} (use inline, external, linked or none)`);
-  process.exit(1);
-}
 
 if (outfile && targets.length > 1) {
   console.error('build: --outfile can only be used with a single --target');
@@ -78,7 +71,7 @@ async function compile(target, binaryPath) {
   fs.mkdirSync(path.dirname(binaryPath), { recursive: true });
   const result = await Bun.build({
     entrypoints: [ENTRY],
-    sourcemap,
+    sourcemap: 'inline',
     compile: { target, outfile: binaryPath },
   });
   if (!result.success) {
@@ -252,7 +245,7 @@ function createZip(zipPath, files) {
 async function main() {
   const ver = version();
   fs.mkdirSync(BUILD_DIR, { recursive: true });
-  console.log(`Building Asphyxia CORE ${ver} (sourcemap: ${sourcemap})`);
+  console.log(`Building Asphyxia CORE ${ver}`);
 
   const built = [];
   for (const target of targets) {
@@ -271,8 +264,7 @@ async function main() {
     }
 
     // Bun strips a trailing .exe when naming sidecar maps
-    const mapPath = `${binaryPath.replace(/\.exe$/i, '')}.map`;
-    built.push({ target, binary, zip, binaryPath, mapPath: fs.existsSync(mapPath) ? mapPath : null });
+    built.push({ target, binary, zip, binaryPath });
   }
 
   if (noZip || outfile) {
@@ -289,21 +281,13 @@ async function main() {
     filter: source => path.basename(source) !== 'node_modules',
   });
 
-  for (const { binary, zip, binaryPath, mapPath } of built) {
+  for (const { binary, zip, binaryPath } of built) {
     const zipPath = path.join(BUILD_DIR, zip);
     const files = [
       { name: binary, path: binaryPath, mtime: fs.statSync(binaryPath).mtime },
       ...collectZipEntries(path.join(BUILD_DIR, 'assets'), 'assets'),
       ...collectZipEntries(path.join(BUILD_DIR, 'plugins'), 'plugins'),
     ];
-    // inline maps are embedded in the binary; external/linked need the sidecar
-    if (mapPath && sourcemap !== 'inline') {
-      files.splice(1, 0, {
-        name: path.basename(mapPath),
-        path: mapPath,
-        mtime: fs.statSync(mapPath).mtime,
-      });
-    }
     createZip(zipPath, files);
     console.log(`  -> ${zip} (${files.length} files, ${(fs.statSync(zipPath).size / 1048576).toFixed(1)} MiB)`);
   }
