@@ -55,9 +55,14 @@ layout and every other section stay untouched.
 
 Plugins stay as plain directories under `plugins/` and are loaded at
 startup. Both JavaScript and TypeScript sources are supported natively
-(Bun transpiles `.ts` on import), so `ts-node` is not required. The
-global API (`$`, `K`, `IO`, `DB`, `U`, `R`, ...) is unchanged; see
+(Bun transpiles `.ts` on import), so `ts-node` is not required and
+plugins are never rejected because of type errors. The global API
+(`$`, `K`, `IO`, `DB`, `U`, `R`, ...) is unchanged; see
 `plugins/asphyxia-core.d.ts`.
+
+Bun does not type check, so `--dev` no longer runs a type checker over
+plugins. To check types yourself, install TypeScript in `plugins/` and
+run `bunx tsc --noEmit -p plugins`.
 
 ## Docker
 
