@@ -5,6 +5,9 @@
 - **CORE**: EAMUSE XML handling uses `Bun.XML`; session, flash, upload and static handling are built in
 - **CORE**: Release artifacts now include inline sourcemaps and the Windows executable embeds `icon.ico`
 - **CORE**: WebUI render errors (500s) are now logged to the server console
+- **CORE**: Savedata is now stored in SQLite (`bun:sqlite`); existing NeDB `*.db` files are migrated automatically on first load with a backup in `savedata/_nedb_backup/`
+- **CORE**: `@seald-io/nedb` is no longer a runtime dependency (dev-only for differential tests)
+- **CORE**: Plugin queries keep NeDB semantics; SQL is used to narrow candidates and hot equality fields are indexed automatically
 - **API**: Plugin WebUI `DATA` blocks can use read-only `IO` (`Resolve`, `Exists`, `ReadFile`, `ReadDir`) alongside `DB`/`U`; `require` is no longer exposed to DATA expressions
 - **API**: Plugin type checking was removed; Bun only transpiles (`bunx tsc --noEmit -p plugins` to check manually)
 

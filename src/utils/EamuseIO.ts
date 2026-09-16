@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFile, readFile, readdir, unli
 
 import { Logger } from './Logger';
 import path from 'path';
-import nedb from '@seald-io/nedb';
+import { SqliteStore } from './db/SqliteStore';
 import { nfc2card } from './CardCipher';
 import hashids from './Hashids';
 import { NAMES } from './Consts';
@@ -22,8 +22,7 @@ const SAVE_PATH = path.resolve(EXEC_PATH, ARGS.savedata);
 const COREDB_FILE = path.join(SAVE_PATH, 'core.db');
 
 const LoadDatabase = async (file: string) => {
-  const DB = new nedb({
-    filename: file,
+  const DB = new SqliteStore(file, {
     timestampData: true,
     corruptAlertThreshold: ARGS.fixdb ? 0.2 : 0,
   });
@@ -76,7 +75,7 @@ const LoadDatabase = async (file: string) => {
   return DB;
 };
 
-let CoreDB: nedb = null;
+let CoreDB: SqliteStore = null;
 export const LoadCoreDB = async () => {
   CoreDB = await LoadDatabase(COREDB_FILE);
 
@@ -85,7 +84,7 @@ export const LoadCoreDB = async () => {
   }
 };
 
-const DBInstances: { [key: string]: nedb } = {};
+const DBInstances: { [key: string]: SqliteStore } = {};
 
 const GET_DB = async (affiliation: string) => {
   if (!DBInstances[affiliation]) {
@@ -436,6 +435,8 @@ export async function PurgeProfile(refid: string) {
 
   const list = await fsp.readdir(SAVE_PATH);
   for (const savefile of list) {
+    // Only plugin databases; skip WAL/SHM files, migration temps and backups.
+    if (!savefile.endsWith('.db')) continue;
     if (savefile.startsWith('_') || savefile.startsWith('.') || savefile.startsWith('core')) {
       continue;
     }
