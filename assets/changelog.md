@@ -4,6 +4,7 @@
 - **CORE**: HTTP layer now runs on `Bun.serve`, plugin TypeScript loads natively without `ts-node`
 - **CORE**: EAMUSE XML handling uses `Bun.XML`; session, flash, upload and static handling are built in
 - **CORE**: Release artifacts now include inline sourcemaps and the Windows executable embeds `icon.ico`
+- **API**: Plugin WebUI `DATA` blocks can now use read-only `IO` (`Resolve`, `Exists`, `ReadFile`, `ReadDir`) alongside `DB`/`U`; `require` stays available for compatibility
 - **API**: Plugin type checking was removed; Bun only transpiles (`bunx tsc --noEmit -p plugins` to check manually)
 
 ## v1.70b
