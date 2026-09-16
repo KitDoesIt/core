@@ -1,3 +1,11 @@
+## v2.00
+
+- **CORE**: Ported to Bun (1.4.2+). Standalone binaries are built with `bun build --compile`
+- **CORE**: HTTP layer now runs on `Bun.serve`, plugin TypeScript loads natively without `ts-node`
+- **CORE**: EAMUSE XML handling uses `Bun.XML`; session, flash, upload and static handling are built in
+- **CORE**: Release artifacts now include inline sourcemaps and the Windows executable embeds `icon.ico`
+- **API**: Plugin type checking was removed; Bun only transpiles (`bunx tsc --noEmit -p plugins` to check manually)
+
 ## v1.70b
 
 - **CORE**: Fixed eamuse service URLs including the local port when not using a reverse proxy
