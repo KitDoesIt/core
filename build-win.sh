@@ -23,5 +23,5 @@ cp -r plugins build/plugins
 
 cd build
 rm -f asphyxia-core-win-x64.zip
-zip -qr asphyxia-core-win-x64.zip asphyxia-core-x64.exe assets plugins
+zip -qr asphyxia-core-win-x64.zip asphyxia-core-x64.exe assets plugins -x "plugins/node_modules/*" "plugins/*/node_modules/*"
 echo "Done: build/asphyxia-core-win-x64.zip"

@@ -24,7 +24,7 @@ pack() {
   local target="$1" name="$2" zipname="$3"
   echo "  -> $target"
   bun build --compile --target="$target" --outfile "build/$name" src/AsphyxiaCore.ts
-  (cd build && rm -f "$zipname" && zip -qr "$zipname" "$(basename "$name")" assets plugins)
+  (cd build && rm -f "$zipname" && zip -qr "$zipname" "$(basename "$name")" assets plugins -x "plugins/node_modules/*" "plugins/*/node_modules/*")
 }
 
 pack bun-linux-x64   asphyxia-core        asphyxia-core-linux-x64.zip
