@@ -15,6 +15,7 @@ import {
   getStr,
 } from '../utils/KBinJSON';
 import { Logger } from '../utils/Logger';
+import { parseXmlSimple } from '../utils/Xml';
 import { KDataReader } from '../utils/KDataReader';
 import {
   PLUGIN_PATH,
@@ -42,7 +43,6 @@ import {
 } from '../utils/ArgConfig';
 import { EamusePlugin, WebUIEventHandler } from './EamusePlugin';
 import { EamuseRouteHandler } from './EamuseRouteContainer';
-import xml2json from 'fast-xml-parser';
 import _ from 'lodash';
 import { isPlainObject } from 'lodash';
 import { VERSION } from '../utils/Consts';
@@ -145,7 +145,7 @@ export function LoadExternalPlugins() {
     toXML: dataToXML,
     parseXML: (xml: string, simplify: boolean = true) => {
       if (simplify) {
-        return xml2json.parse(xml);
+        return parseXmlSimple(xml);
       } else {
         return xmlToData(xml);
       }
