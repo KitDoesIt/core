@@ -31,7 +31,7 @@ import {
   APICount,
   Exists,
 } from '../utils/EamuseIO';
-import { readdirSync, existsSync } from 'fs';
+import { readdirSync } from 'fs';
 import {
   ARGS,
   PluginRegisterConfig,
@@ -96,22 +96,6 @@ export type PluginDetect = {
 export function LoadExternalPlugins() {
   /* Exposing API */
   const $: any = global;
-
-  const tsconfig = path.join(PLUGIN_PATH, 'tsconfig.json');
-  /* ncc/pkg hack */
-  // require('typescript');
-  const ts_node = require('ts-node');
-  if (existsSync(tsconfig)) {
-    /* Inject ts-node */
-    ts_node.register({
-      project: tsconfig,
-      typeCheck: false,
-      files: false,
-      transpileOnly: ARGS.dev ? false : true,
-    });
-  } else {
-    ts_node.register({ typeCheck: false, files: false, transpileOnly: ARGS.dev ? false : true });
-  }
 
   $.$ = (data: any) => {
     if (!isPlainObject(data)) {
