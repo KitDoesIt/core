@@ -6,7 +6,8 @@ import { readFileSync, writeFileSync, accessSync } from 'fs';
 import { parse, stringify } from './Ini';
 import path from 'path';
 
-const EXEC_PATH = path.resolve((process as any).pkg ? path.dirname(process.argv0) : process.cwd());
+import { EXEC_PATH } from './Env';
+
 const CONFIG_PATH = path.join(EXEC_PATH, 'config.ini');
 
 const parser = new ArgumentParser({

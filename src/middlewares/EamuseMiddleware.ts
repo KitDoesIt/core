@@ -1,4 +1,5 @@
 import { Handler, HttpRequest, HttpResponse } from '../http/Engine';
+import { IS_PACKAGED } from '../utils/Env';
 import { findKey, get, has } from 'lodash';
 
 import {
@@ -144,7 +145,7 @@ export const EamuseMiddleware: Handler = async (req, res, next) => {
   const eaMethod = eaMethods.join('.');
   const model = get(xml, 'call.@attr.model');
 
-  if (!(process as any).pkg) {
+  if (!IS_PACKAGED) {
     Logger.debug(`${eaModule}.${eaMethod}\n${dataToXML(xml, false)}`);
   }
 

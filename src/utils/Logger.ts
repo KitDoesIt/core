@@ -1,4 +1,5 @@
 import { cyanBright, yellowBright } from './Colors';
+import { IS_PACKAGED } from './Env';
 
 /**
  * Standalone replacement for the winston logger.
@@ -24,7 +25,7 @@ const LEVEL_COLORS: { [key: string]: string } = {
 };
 
 /** Packaged builds suppress debug messages, exactly like winston's `level: 'info'`. */
-const isDebug = !(process as any).pkg;
+const isDebug = !IS_PACKAGED;
 
 function colorizeLevel(level: string): string {
   const color = LEVEL_COLORS[level];

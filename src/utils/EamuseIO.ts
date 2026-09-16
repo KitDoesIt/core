@@ -13,11 +13,10 @@ import { ROOT_CONTAINER } from '../eamuse';
 import { promises as fsp } from 'fs';
 import prettyBytes from './PrettyBytes';
 
-const pkg: boolean = (process as any).pkg;
-const EXEC_PATH = path.resolve(pkg ? path.dirname(process.argv0) : process.cwd());
+import { EXEC_PATH, ASSETS_PATH } from './Env';
 
 export const PLUGIN_PATH = path.join(EXEC_PATH, 'plugins');
-export const ASSETS_PATH = path.join(pkg ? __dirname : `../build-env`, 'assets');
+export { ASSETS_PATH };
 
 const SAVE_PATH = path.resolve(EXEC_PATH, ARGS.savedata);
 const COREDB_FILE = path.join(SAVE_PATH, 'core.db');

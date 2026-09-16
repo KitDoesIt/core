@@ -64,11 +64,11 @@ function unsafe(val: string, _doUnesc?: boolean): any {
 
 function dotSplit(str: string): string[] {
   return str
-    .replace(/\1/g, '\u0002LITERAL\\1LITERAL\u0002')
+    .replace(/\u0001/g, '\u0002LITERAL\\1LITERAL\u0002')
     .replace(/\\\./g, '\u0001')
     .split(/\./)
     .map(part =>
-      part.replace(/\1/g, '\\.').replace(/\2LITERAL\\1LITERAL\2/g, '\u0001')
+      part.replace(/\u0001/g, '\\.').replace(/\u0002LITERAL\\1LITERAL\u0002/g, '\u0001')
     );
 }
 

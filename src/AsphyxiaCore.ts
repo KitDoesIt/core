@@ -1,4 +1,6 @@
-if ((process as any).pkg) process.env.NODE_ENV = 'production';
+import { IS_PACKAGED } from './utils/Env';
+
+if (IS_PACKAGED) process.env.NODE_ENV = 'production';
 
 import { Logger } from './utils/Logger';
 import { ARGS, CONFIG, ReadConfig, SaveConfig } from './utils/ArgConfig';

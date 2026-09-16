@@ -1,36 +1,35 @@
 #!/bin/bash
+# Builds standalone Asphyxia CORE binaries with `bun build --compile`.
+set -euo pipefail
+cd "$(dirname "$0")"
 
 mkdir -p build
 
 regex='VERSION = '"'"'([a-z0-9.]*)'"'"''
 [[ $(cat ./src/utils/Consts.ts) =~ $regex ]]
-
 VERSION=${BASH_REMATCH[1]}
 
-echo "Building Version $VERSION for Linux"
+echo "Building Version $VERSION"
 
-echo "NPM Install"
-npm ci
+if [ ! -d node_modules ]; then
+  bun install --frozen-lockfile || bun install
+fi
 
-echo "Building Typescripts"
-npx tsc
+# Bundle assets/plugins once; they are shipped next to each binary.
+rm -rf build/assets build/plugins
+cp -r assets build/assets
+cp -r plugins build/plugins
 
-echo "Packing index.js"
-npx ncc build ./dist/AsphyxiaCore.js -o ./build-env --external pug --external ts-node
+pack() {
+  local target="$1" name="$2" zipname="$3"
+  echo "  -> $target"
+  bun build --compile --target="$target" --outfile "build/$name" src/AsphyxiaCore.ts
+  (cd build && rm -f "$zipname" && zip -qr "$zipname" "$(basename "$name")" assets plugins)
+}
 
-echo "Setting Up Build Environment"
-cd ./build-env
-npm ci
-cp -r typescript ./node_modules/
+pack bun-linux-x64   asphyxia-core        asphyxia-core-linux-x64.zip
+pack bun-linux-arm64 asphyxia-core-arm64  asphyxia-core-arm64.zip
+pack bun-windows-x64 asphyxia-core-x64.exe asphyxia-core-win-x64.zip
 
-echo "Packing binaries"
-cd ..
-npx pkg ./build-env -t node16.16.0-linux-x64 -o ./build/asphyxia-core --options no-warnings
-
-echo "Compressing"
-
-rm -f ./build/asphyxia-core-linux-x64.zip
-cd build
-zip -qq asphyxia-core-linux-x64.zip asphyxia-core
-cd ..
-zip -qq ./build/asphyxia-core-linux-x64.zip -r plugins
+echo "Done. Artifacts in ./build"
+ls -1 build/*.zip
