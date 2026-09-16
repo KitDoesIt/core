@@ -1,9 +1,9 @@
-import { ArgumentParser } from 'argparse';
+import { ArgumentParser } from './Argparse';
 import { VERSION } from './Consts';
 
 import { Logger } from './Logger';
 import { readFileSync, writeFileSync, accessSync } from 'fs';
-import { parse, stringify } from 'ini';
+import { parse, stringify } from './Ini';
 import path from 'path';
 
 const EXEC_PATH = path.resolve((process as any).pkg ? path.dirname(process.argv0) : process.cwd());
