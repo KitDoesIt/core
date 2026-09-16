@@ -5,9 +5,10 @@
  *   bun run build                       # linux-x64, linux-arm64, windows-x64 + zips
  *   bun run build --target=bun-linux-x64 --no-zip --outfile=/tmp/asphyxia-core
  *
- * Uses Bun.build's compile mode for cross-compilation, embeds icon.ico
- * into Windows executables and writes zip artifacts without external
- * tools (Bun.hash.crc32 + zlib raw deflate).
+ * Uses Bun.build's compile mode (with bytecode and inline sourcemaps)
+ * for cross-compilation, embeds icon.ico into Windows executables and
+ * writes zip artifacts without external tools (Bun.hash.crc32 + zlib
+ * raw deflate).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -72,7 +73,7 @@ async function compile(target, binaryPath) {
   const result = await Bun.build({
     entrypoints: [ENTRY],
     sourcemap: 'inline',
-    compile: { target, outfile: binaryPath },
+    compile: { target, outfile: binaryPath, bytecode: true },
   });
   if (!result.success) {
     for (const log of result.logs) console.error(log);
@@ -165,10 +166,12 @@ function collectZipEntries(root, prefix) {
       const full = path.join(directory, item.name);
       const entryName = `${name}${item.name}`;
       if (item.isDirectory()) {
-        entries.push({ name: `${entryName}/`, directory: true, mtime: fs.statSync(full).mtime });
+        const stat = fs.statSync(full);
+        entries.push({ name: `${entryName}/`, directory: true, mtime: stat.mtime, mode: stat.mode });
         walk(full, `${entryName}/`);
       } else if (item.isFile()) {
-        entries.push({ name: entryName, path: full, mtime: fs.statSync(full).mtime });
+        const stat = fs.statSync(full);
+        entries.push({ name: entryName, path: full, mtime: stat.mtime, mode: stat.mode });
       }
     }
   };
@@ -219,7 +222,8 @@ function createZip(zipPath, files) {
     entry.writeUInt16LE(0, 32);
     entry.writeUInt16LE(0, 34);
     entry.writeUInt16LE(0, 36);
-    entry.writeUInt32LE(file.directory ? 0x41ed0010 : 0x81a40000, 38);
+    const mode = file.mode ?? (file.directory ? 0o40755 : 0o100644);
+    entry.writeUInt32LE((((mode & 0xffff) << 16) | (file.directory ? 0x10 : 0)) >>> 0, 38);
     entry.writeUInt32LE(offset, 42);
     central.push(entry, name);
 
@@ -283,8 +287,9 @@ async function main() {
 
   for (const { binary, zip, binaryPath } of built) {
     const zipPath = path.join(BUILD_DIR, zip);
+    const binaryStat = fs.statSync(binaryPath);
     const files = [
-      { name: binary, path: binaryPath, mtime: fs.statSync(binaryPath).mtime },
+      { name: binary, path: binaryPath, mtime: binaryStat.mtime, mode: binaryStat.mode },
       ...collectZipEntries(path.join(BUILD_DIR, 'assets'), 'assets'),
       ...collectZipEntries(path.join(BUILD_DIR, 'plugins'), 'plugins'),
     ];
