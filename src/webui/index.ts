@@ -46,7 +46,7 @@ import { ROOT_CONTAINER } from '../eamuse/index';
 import { fun } from './fun';
 import { card2nfc, nfc2card, cardType } from '../utils/CardCipher';
 import { groupBy, startCase, lowerCase, upperFirst } from 'lodash';
-import { sizeof } from 'sizeof';
+import { sizeof } from '../utils/Sizeof';
 import { ajax as emit } from './emit';
 import { Logger } from '../utils/Logger';
 

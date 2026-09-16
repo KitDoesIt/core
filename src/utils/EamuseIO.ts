@@ -4,14 +4,14 @@ import { Logger } from './Logger';
 import path from 'path';
 import nedb from '@seald-io/nedb';
 import { nfc2card } from './CardCipher';
-import hashids from 'hashids/cjs';
+import hashids from './Hashids';
 import { NAMES } from './Consts';
 import { CONFIG, ARGS } from './ArgConfig';
 import { isArray, get, isPlainObject, sortBy } from 'lodash';
 import { PluginDetect } from '../eamuse/ExternalPluginLoader';
 import { ROOT_CONTAINER } from '../eamuse';
 import { promises as fsp } from 'fs';
-import prettyBytes from 'pretty-bytes';
+import prettyBytes from './PrettyBytes';
 
 const pkg: boolean = (process as any).pkg;
 const EXEC_PATH = path.resolve(pkg ? path.dirname(process.argv0) : process.cwd());

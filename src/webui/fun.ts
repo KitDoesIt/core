@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import open from 'open';
+import open from '../utils/Open';
 import { PLUGIN_PATH } from '../utils/EamuseIO';
 
 export const fun = Router();

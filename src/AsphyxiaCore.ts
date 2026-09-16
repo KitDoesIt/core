@@ -11,7 +11,7 @@ import { LoadExternalPlugins } from './eamuse/ExternalPluginLoader';
 import { webui } from './webui/index';
 import path from 'path';
 import { ASSETS_PATH, LoadCoreDB } from './utils/EamuseIO';
-import open from 'open';
+import open from './utils/Open';
 import { Migrate } from './utils/migration';
 
 function isIPv6(ip: string) {
