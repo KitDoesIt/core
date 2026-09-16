@@ -5,7 +5,7 @@ import { ARGS, CONFIG, ReadConfig, SaveConfig } from './utils/ArgConfig';
 import { services } from './eamuse';
 import { VERSION } from './utils/Consts';
 import { pad } from 'lodash';
-import express from 'express';
+import { App, staticHandler } from './http/Engine';
 import chalk from './utils/Colors';
 import { LoadExternalPlugins } from './eamuse/ExternalPluginLoader';
 import { webui } from './webui/index';
@@ -47,7 +47,7 @@ function Main() {
   Logger.info(pad(`If you bought this software, request refund immediately.`, 60));
   Logger.info(` `);
 
-  const EAMUSE = express();
+  const EAMUSE = new App();
 
   EAMUSE.disable('etag');
   EAMUSE.disable('x-powered-by');
@@ -71,11 +71,25 @@ function Main() {
   EAMUSE.set('views', path.join(ASSETS_PATH, 'views'));
   EAMUSE.set('view engine', 'pug');
   EAMUSE.use('*', services(CONFIG.port, external));
-  EAMUSE.use('/static', express.static(path.join(ASSETS_PATH, 'static')));
+  EAMUSE.use('/static', staticHandler(path.join(ASSETS_PATH, 'static')));
   EAMUSE.use(webui);
 
   // ========== LISTEN ============
-  const server = EAMUSE.listen(CONFIG.port, CONFIG.bind, () => {
+  const onServerError = (err: any) => {
+    if (err && err.code == 'EADDRINUSE') {
+      Logger.info('Server failed to start: port might be in use.');
+      Logger.info('Use -p argument to change port.');
+    }
+    Logger.info(' ');
+    Logger.error(`     ${err.message}`);
+    Logger.info(' ');
+    Logger.info('Press any key to exit.');
+    process.stdin.resume();
+    process.stdin.on('data', process.exit.bind(process, 0));
+  };
+
+  try {
+    EAMUSE.listen(CONFIG.port, CONFIG.bind, () => {
     const cleaned = cleanIP(CONFIG.bind);
     const isV6 = isIPv6(cleaned);
     const printAddr = isV6 ? `[${cleaned}]` : cleaned;
@@ -98,25 +112,15 @@ function Main() {
     Logger.info(`   +==============================================+`);
     Logger.info('');
 
-    if (CONFIG.webui_on_startup) {
-      try {
-        open(`http://${openAddr}:${CONFIG.port}`);
-      } catch {}
-    }
-  });
-
-  server.on('error', (err: any) => {
-    if (err && err.code == 'EADDRINUSE') {
-      Logger.info('Server failed to start: port might be in use.');
-      Logger.info('Use -p argument to change port.');
-    }
-    Logger.info(' ');
-    Logger.error(`     ${err.message}`);
-    Logger.info(' ');
-    Logger.info('Press any key to exit.');
-    process.stdin.resume();
-    process.stdin.on('data', process.exit.bind(process, 0));
-  });
+      if (CONFIG.webui_on_startup) {
+        try {
+          open(`http://${openAddr}:${CONFIG.port}`);
+        } catch {}
+      }
+    });
+  } catch (err) {
+    onServerError(err);
+  }
 }
 
 Migrate().then(() => {

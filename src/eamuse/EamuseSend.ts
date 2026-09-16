@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { HttpResponse } from '../http/Engine';
 import { defaultTo, set, get, isArray } from 'lodash';
 import { kencode, xmlToData, KBinEncoding, dataToXMLBuffer } from '../utils/KBinJSON';
 import { KonmaiEncrypt } from '../utils/KonmaiEncrypt';
@@ -27,10 +27,10 @@ export interface EamuseSendOption {
 
 export class EamuseSend {
   private sent: boolean;
-  private res: Response;
+  private res: HttpResponse;
   private body: EABody;
 
-  constructor(body: EABody, res: Response) {
+  constructor(body: EABody, res: HttpResponse) {
     this.body = body;
     this.res = res;
   }
