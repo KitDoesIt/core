@@ -11,7 +11,7 @@ COPY src/ ./src/
 COPY assets/ ./assets/
 COPY plugins/ ./plugins/
 
-RUN bun build --compile --outfile /app/asphyxia-core src/AsphyxiaCore.ts
+RUN bun run build --target=bun-linux-x64 --no-zip --outfile=/app/asphyxia-core
 
 # Runtime stage
 FROM debian:bookworm-slim

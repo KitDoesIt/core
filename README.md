@@ -34,9 +34,8 @@ compiled builds.
 ## Build
 
 ```bash
-bun run build                      # native standalone binary -> build/asphyxia-core
-bash build-linux.sh                # linux-x64 + linux-arm64 + windows-x64 zips
-bash build-win.sh                  # windows-x64 zip only
+bun run build                      # linux-x64 + linux-arm64 + windows-x64 zips
+bun run build --target=bun-linux-x64 --no-zip --outfile=build/asphyxia-core
 ```
 
 Standalone binaries are produced with `bun build --compile`. The zip
