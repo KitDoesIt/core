@@ -6,7 +6,7 @@ Bun built-ins.
 
 ## Requirements
 
-- [Bun](https://bun.sh) **1.4.0** or newer (`Bun.XML` is required)
+- [Bun](https://bun.sh) **1.4.2** or newer (`Bun.XML` is required)
 
 ## Run from source
 
