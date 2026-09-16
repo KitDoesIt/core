@@ -705,5 +705,6 @@ webui.use(async (req, res, next) => {
 
 // 500 - Any server error
 webui.use((err: any, req: any, res: any, next: any) => {
+  Logger.error(err);
   return res.status(500).render('500', data(req, '500 - Oops', 'core', { err }));
 });
