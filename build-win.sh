@@ -1,5 +1,7 @@
 #!/bin/bash
-# Builds a standalone Windows x64 Asphyxia CORE binary with `bun build --compile`.
+# Cross-compiles a Windows x64 Asphyxia CORE binary from Linux/macOS.
+# Note: Bun cannot embed --windows-icon when cross-compiling; use
+# build-win.ps1 on Windows for the icon.
 set -euo pipefail
 cd "$(dirname "$0")"
 

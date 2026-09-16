@@ -36,12 +36,17 @@ compiled builds.
 ```bash
 bun run build                      # native standalone binary -> build/asphyxia-core
 bash build-linux.sh                # linux-x64 + linux-arm64 + windows-x64 zips
-bash build-win.sh                  # windows-x64 zip
+bash build-win.sh                  # windows-x64 zip only
 ```
 
 Standalone binaries are produced with `bun build --compile`. The zip
 artifacts contain the binary plus `assets/` and `plugins/`; extract and
 run the executable from any directory.
+
+All targets cross-compile from Linux. Bun only allows
+`--windows-icon` when compiling on Windows, so the Windows executable
+gets `icon.ico` only when `build-linux.sh` is run from a Windows shell
+(Git Bash/MSYS); Linux cross-builds use Bun's default icon.
 
 ## Plugins
 
