@@ -6,7 +6,7 @@ import { services } from './eamuse';
 import { VERSION } from './utils/Consts';
 import { pad } from 'lodash';
 import express from 'express';
-import chalk from 'chalk';
+import chalk from './utils/Colors';
 import { LoadExternalPlugins } from './eamuse/ExternalPluginLoader';
 import { webui } from './webui/index';
 import path from 'path';

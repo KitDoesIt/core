@@ -10,7 +10,7 @@ import { render as ejs, compile as ejsCompile } from 'ejs';
 import { compile as pugCompile, compileFile as pugCompileFile } from 'pug';
 import path from 'path';
 import { EABody } from '../middlewares/EamuseMiddleware';
-import chalk from 'chalk';
+import chalk from '../utils/Colors';
 import { readFileSync } from 'fs';
 import { GetCallerPlugin } from './ExternalPluginLoader';
 
