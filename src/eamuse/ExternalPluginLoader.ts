@@ -30,6 +30,8 @@ import {
   APIUpdate,
   APIUpsert,
   APICount,
+  APIEnsureIndex,
+  APIRemoveIndex,
   Exists,
 } from '../utils/EamuseIO';
 import { readdirSync } from 'fs';
@@ -139,6 +141,8 @@ export function LoadExternalPlugins() {
     Update: WrapCall('DB.Update', APIUpdate, Pro({ updated: 0, docs: [] })),
     Upsert: WrapCall('DB.Upsert', APIUpsert, Pro({ updated: 0, docs: [], upsert: false })),
     Count: WrapCall('DB.Count', APICount, Pro(0)),
+    EnsureIndex: WrapCall('DB.EnsureIndex', APIEnsureIndex, Pro(void 0)),
+    RemoveIndex: WrapCall('DB.RemoveIndex', APIRemoveIndex, Pro(void 0)),
   };
 
   $.U = {

@@ -790,3 +790,38 @@ export async function APICount(plugin: PluginDetect, arg1: string | any, arg2?: 
 
   return await DB.countAsync(query);
 }
+
+/**
+ * Declare an index on one of the plugin's fields. Indexes are scoped to the
+ * plugin's whole database file (not a single collection), mirroring NeDB.
+ */
+export async function APIEnsureIndex(plugin: PluginDetect, options: any): Promise<void> {
+  const fieldName = options?.fieldName;
+  if (typeof fieldName !== 'string' || fieldName.length === 0) throw new Error('EnsureIndex requires a fieldName');
+  if (fieldName.startsWith('__')) throw new Error('indexed field can not start with "__"');
+  if (options.unique != null && typeof options.unique !== 'boolean') throw new Error('unique must be a boolean');
+  if (options.sparse != null && typeof options.sparse !== 'boolean') throw new Error('sparse must be a boolean');
+  if (options.expireAfterSeconds != null && typeof options.expireAfterSeconds !== 'number')
+    throw new Error('expireAfterSeconds must be a number');
+
+  const DB = await GET_DB(plugin.identifier);
+  if (!DB) throw new Error(`database failed to load`);
+
+  await DB.ensureIndexAsync({
+    fieldName,
+    unique: options.unique,
+    sparse: options.sparse,
+    expireAfterSeconds: options.expireAfterSeconds,
+  });
+}
+
+/** Remove a previously declared index. Removing a missing index is a no-op. */
+export async function APIRemoveIndex(plugin: PluginDetect, fieldName: any): Promise<void> {
+  if (typeof fieldName !== 'string' || fieldName.length === 0) throw new Error('RemoveIndex requires a fieldName');
+  if (fieldName.startsWith('__')) throw new Error('indexed field can not start with "__"');
+
+  const DB = await GET_DB(plugin.identifier);
+  if (!DB) throw new Error(`database failed to load`);
+
+  await DB.removeIndexAsync(fieldName);
+}

@@ -1141,6 +1141,26 @@ type Update<T> = Partial<T> & {
 };
 
 /**
+ * Options for [[DB.EnsureIndex]].
+ */
+interface EnsureIndexOptions {
+  /** Field to index. Dot notation is supported. */
+  fieldName: string;
+  /**
+   * Enforce uniqueness on the indexed field. Inserts or updates that would
+   * create a duplicate throw an error.
+   */
+  unique?: boolean;
+  /**
+   * Allow multiple documents where the field is missing. Useful together with
+   * `unique` (documents without the field are not indexed).
+   */
+  sparse?: boolean;
+  /** Time to live in seconds (NeDB compatibility). */
+  expireAfterSeconds?: number;
+}
+
+/**
  * Database operation.
  *
  * There are two pools of data for each plugin: ___PluginSpace___ and __ProfileSpace__
@@ -1212,6 +1232,29 @@ declare namespace DB {
 
   function Count<T>(refid: string | null, query: Query<T>): Promise<number>;
   function Count<T>(query: Query<T>): Promise<number>;
+
+  /**
+   * Declare an index on a field so lookups on it can be served from the index.
+   *
+   * Indexes are file-wide: one plugin database can hold several collections
+   * (see the `collection` field), but an index applies to the whole file, just
+   * like the underlying store.
+   *
+   * The call is idempotent: declaring an index that already exists does
+   * nothing. Existing documents are indexed when the index is created. Fields
+   * whose name starts with `__` cannot be indexed.
+   *
+   * Indexes are an optimisation hint. Queries keep working without them;
+   * declaring one for a field that is queried often (and holds many distinct
+   * values) avoids scanning the collection.
+   */
+  function EnsureIndex(options: EnsureIndexOptions): Promise<void>;
+
+  /**
+   * Remove a previously declared index. Removing an index that does not exist
+   * is a no-op.
+   */
+  function RemoveIndex(fieldName: string): Promise<void>;
 }
 
 /** @ignore */

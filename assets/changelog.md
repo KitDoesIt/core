@@ -9,6 +9,7 @@
 - **CORE**: `@seald-io/nedb` is no longer a runtime dependency (dev-only for differential tests)
 - **CORE**: Plugin queries keep NeDB semantics; SQL is used to narrow candidates and hot equality fields are indexed automatically
 - **API**: Plugin WebUI `DATA` blocks can use read-only `IO` (`Resolve`, `Exists`, `ReadFile`, `ReadDir`) alongside `DB`/`U`; `require` is no longer exposed to DATA expressions
+- **API**: Plugins can declare data indexes with `DB.EnsureIndex` and remove them with `DB.RemoveIndex`
 - **API**: Plugin type checking was removed; Bun only transpiles (`bunx tsc --noEmit -p plugins` to check manually)
 
 ## v1.70b
